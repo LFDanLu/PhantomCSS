@@ -28,8 +28,10 @@ casper.test.begin( 'Coffee machine visual tests', function ( test ) {
 		// SlimerJS needs explicit knowledge of this Casper, and lots of absolute paths
 		casper: casper,
 		libraryRoot: fs.absolute( fs.workingDirectory + '' ),
-		screenshotRoot: fs.absolute( fs.workingDirectory + '/screenshots' ),
-		failedComparisonsRoot: fs.absolute( fs.workingDirectory + '/demo/failures' ),
+		screenshotRoot: fs.absolute( fs.workingDirectory + '/baseline' ),
+		failedComparisonsRoot: fs.absolute( fs.workingDirectory + '/failures' ),
+		// cleanupComparisonImages: true,
+		comparisonResultRoot: fs.absolute( fs.workingDirectory + '/diffs' ),
 		addLabelToFailedImage: false,
 		/*
 		screenshotRoot: '/screenshots',
