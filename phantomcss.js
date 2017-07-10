@@ -16,7 +16,7 @@ var _hideElements;
 var _waitTimeout = 60000;
 var _addLabelToFailedImage = true;
 var _mismatchTolerance = 0.05;
-var _resembleOutputSettings;
+var _resembleOutputSettings = {};
 var _cleanupComparisonImages = false;
 var diffsCreated = [];
 
@@ -66,7 +66,7 @@ function update( options ) {
 	_resembleContainerPath = _resembleContainerPath || getResembleContainerPath( _libraryRoot );
 
 	_src = stripslash( options.screenshotRoot || _src );
-	_results = stripslash( options.comparisonResultRoot || _results || _src );
+	_results = stripslash( options.comparisonResultRoot || options.screenshotRoot || _results || _src );
 	_failures = options.failedComparisonsRoot === false ? false : stripslash( options.failedComparisonsRoot || _failures );
 
 	_fileNameGetter = options.fileNameGetter || _fileNameGetter;
@@ -87,6 +87,8 @@ function update( options ) {
 	_rebase = isNotUndefined(options.rebase) ? options.rebase : _rebase;
 
 	_resembleOutputSettings = options.outputSettings || _resembleOutputSettings;
+
+	_resembleOutputSettings.useCrossOrigin=false; // turn off x-origin attr in Resemble to support SlimerJS 
 
 	_cleanupComparisonImages = options.cleanupComparisonImages || _cleanupComparisonImages;
 
@@ -472,7 +474,6 @@ function compareFiles( baseFile, file ) {
 								casper.captureSelector( failFile, 'img' );
 
 								test.failFile = failFile;
-								console.log( 'Failure! Saved to ' + failFile );
 							}
 
 							if ( file.indexOf( _diffImageSuffix + '.png' ) !== -1 ) {
@@ -632,12 +633,14 @@ function initClient() {
 
 function _onPass( test ) {
 	console.log( '\n' );
-	casper.test.pass( 'No changes found for screenshot ' + test.filename );
+	var name = 'Should look the same ' + test.filename;
+	casper.test.pass(name, {name: name});
 }
 
 function _onFail( test ) {
-	console.log( '\n' );
-	casper.test.fail( 'Visual change found for screenshot ' + test.filename + ' (' + test.mismatch + '% mismatch)' );
+	console.log('\n');
+	var name = 'Should look the same ' + test.filename;
+	casper.test.fail(name, {name:name, message: 'Looks different (' + test.mismatch + '% mismatch) ' + test.failFile });
 }
 
 function _onTimeout( test ) {
